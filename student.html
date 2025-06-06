@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Management System</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(to right, #87ceeb, #e0f7fa);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #004d66;
+      text-shadow: 1px 1px white;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      max-width: 700px;
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      margin: auto;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .form-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .form-group i {
+      margin-right: 10px;
+      font-size: 18px;
+      color: #0077b6;
+      width: 25px;
+      text-align: center;
+    }
+
+    .form-group input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    .btn {
+      padding: 10px 15px;
+      background-color: #0288d1;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-right: 10px;
+    }
+
+    .btn:hover {
+      background-color: #01579b;
+    }
+
+    .search-group {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-group input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-right: 10px;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 25px;
+      border-collapse: collapse;
+      background: #f9f9f9;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #bbb;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #00acc1;
+      color: white;
+    }
+
+    @media (max-width: 600px) {
+      .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .form-group i {
+        margin-bottom: 5px;
+      }
+
+      .search-group {
+        flex-direction: column;
+      }
+
+      .search-group input {
+        margin-bottom: 10px;
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+        margin-right: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1><i class="fa-solid fa-user-graduate"></i> Student Management System</h1>
+
+  <div class="container">
+    <div class="form-group"><i class="fa-solid fa-id-card"></i><input type="text" id="admission" placeholder="Admission Number"></div>
+    <div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="name" placeholder="First Name"></div>
+    <div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="surname" placeholder="Surname"></div>
+    <div class="form-group"><i class="fa-solid fa-calendar"></i><input type="number" id="age" placeholder="Age"></div>
+    <div class="form-group"><i class="fa-solid fa-phone"></i><input type="text" id="phone" placeholder="Phone Number"></div>
+    <div class="form-group"><i class="fa-solid fa-envelope"></i><input type="email" id="email" placeholder="Email"></div>
+    <div class="form-group"><i class="fa-solid fa-location-dot"></i><input type="text" id="address" placeholder="Address"></div>
+
+    <button class="btn" id="addBtn"><i class="fa-solid fa-plus"></i> Add Student</button>
+    <button class="btn" id="deleteBtn"><i class="fa-solid fa-trash"></i> Delete Student</button>
+
+    <div class="search-group">
+      <input type="text" id="searchAdmission" placeholder="Search by Admission Number">
+      <button class="btn" id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </div>
+
+    <table id="studentTable">
+      <thead>
+        <tr>
+          <th>Admission No</th>
+          <th>Name</th>
+          <th>Surname</th>
+          <th>Age</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Address</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const students = [];
+
+    document.getElementById('addBtn').addEventListener('click', () => {
+      const admission = document.getElementById("admission").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const surname = document.getElementById("surname").value.trim();
+      const age = document.getElementById("age").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const address = document.getElementById("address").value.trim();
+
+      if (!admission || !name || !surname || !age || !phone || !email || !address) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      const exists = students.some(s => s.admission === admission);
+      if (exists) {
+        alert("Admission number already exists!");
+        return;
+      }
+
+      students.push({ admission, name, surname, age, phone, email, address });
+      updateTable();
+      clearForm();
+    });
+
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+      const admission = document.getElementById("admission").value.trim();
+      const index = students.findIndex(s => s.admission === admission);
+      if (index !== -1) {
+        students.splice(index, 1);
+        updateTable();
+        alert("Student deleted.");
+        clearForm();
+      } else {
+        alert("Admission number not found.");
+      }
+    });
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      const search = document.getElementById("searchAdmission").value.trim();
+      const student = students.find(s => s.admission === search);
+      if (student) {
+        alert(
+          `Student Found:\nName: ${student.name} ${student.surname}\nAge: ${student.age}\nPhone: ${student.phone}\nEmail: ${student.email}\nAddress: ${student.address}`
+        );
+      } else {
+        alert("Student not found.");
+      }
+    });
+
+    function updateTable() {
+      const tbody = document.querySelector("#studentTable tbody");
+      tbody.innerHTML = "";
+      students.forEach(s => {
+        const row = `<tr>
+          <td>${s.admission}</td>
+          <td>${s.name}</td>
+          <td>${s.surname}</td>
+          <td>${s.age}</td>
+          <td>${s.phone}</td>
+          <td>${s.email}</td>
+          <td>${s.address}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+
+    function clearForm() {
+      document.getElementById("admission").value = "";
+      document.getElementById("name").value = "";
+      document.getElementById("surname").value = "";
+      document.getElementById("age").value = "";
+      document.getElementById("phone").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("address").value = "";
+    }
+  </script>
+</body>
+</html>
